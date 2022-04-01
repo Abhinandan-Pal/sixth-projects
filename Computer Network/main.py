@@ -5,12 +5,13 @@ from tkinter import font
 
 def textEditor():
 	def __init__(self,Name):
-old_text = ""
-def sync():
-	global old_text
-	new_text = my_text.get("1.0",END)
-	peer.get_CRDT_commands(old_text,new_text)
-	old_text = new_text
+	
+	old_text = ""
+	def sync():
+		global old_text
+		new_text = my_text.get("1.0",END)
+		peer.get_CRDT_commands(old_text,new_text)
+		old_text = new_text
 
 
 	root = Tk()
