@@ -101,12 +101,13 @@ if __name__ == '__main__':
     print(p, q)
 
     publickey, privatekey = generate_keypair(p, q)
-    print(publickey, privatekey)
+    print(f"Public key: {publickey}")
+    print(f"Private key: {privatekey}")
 
-    message = input("Message (int): ")
+    #message = input("Message (int): ")
 
-    encrypted_msg = encrypt(privatekey, int(message))
-    print(f"Encrypted message: {encrypted_msg}")
+    #encrypted_msg = encrypt(privatekey, int(message))
+    #print(f"Encrypted message: {encrypted_msg}")
 
-    decrypted_msg = decrypt(publickey, encrypted_msg)
-    print(f"Decrypted message: {decrypted_msg}")
+    #decrypted_msg = decrypt(publickey, encrypted_msg)
+    #print(f"Decrypted message: {decrypted_msg}")
