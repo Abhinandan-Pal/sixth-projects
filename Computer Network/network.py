@@ -29,9 +29,7 @@ def server_thread_func(sock: socket.socket, root):
         #msg = rsa.decrypt(peer[3], rsa.decrypt(self_key, int(msg)))
         msg = rsa.decrypt(self_key, int(msg))
         msg = msg.to_bytes(4096, 'little').rstrip(b'\0')
-        print(peer[2], ': ', msg)
 
-        print(b"RECV: " + msg)
         delta = pickle.loads(msg)
         recv_queue.append(delta)
         root.event_generate("<<RecvUpdate>>")
@@ -72,7 +70,6 @@ def sync(msg: bytes):
     for peer in peers:
         clientsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsock.connect((peer[0], peer[1]))
-        print(b"SEND: " + msg)
         cleartext = int.from_bytes(msg, 'little')
         # sign
         #ciphertext = rsa.encrypt(self_key, cleartext)

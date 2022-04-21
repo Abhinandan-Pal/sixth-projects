@@ -10,14 +10,14 @@ class index:
         return f"(uid = {self.user_id}, count = {self.count})"
 
     def __repr__(self):
-        #return f"(uid = {self.user_id}, count = {self.count})"
+        # return f"(uid = {self.user_id}, count = {self.count})"
         return f"({self.user_id},{self.count})"
-    
-    def __eq__(self,oth):
+
+    def __eq__(self, oth):
         return (self.user_id == oth.user_id) and (self.count == oth.count)
 
     def __hash__(self):
-        return self.user_id*50 + self.count
+        return 0
 
     def isgreater(in1, in2):
         if(in1.count > in2.count):
@@ -83,13 +83,15 @@ class crdt:
             if(current.count > self.users_count[user]):
                 self.users_count[user] = current.count
 
+        print(f"CHANGING {current} with {data}")
         self.doc[current] = [data, True]
 
         a_pos = self.get_index(add_after) + 1
         while(a_pos < len(self.order) and index.isgreater(self.order[a_pos], current)):
             a_pos += 1
 
-        if current in self.order: self.order.remove(current)     # added to debug
+        if current in self.order:
+            self.order.remove(current)     # added to debug
         self.order.insert(a_pos, current)
         #print(f"Succesfully added {data} at {current} after {add_after}")
 
@@ -115,41 +117,6 @@ class crdt:
             if(val[1]):
                 text += val[0]
         return text
-
-    def add_element_UI():
-        for i in range(len(self.docStr)):
-            print(f"{i}:{self.docStr[i]}", end=" ")
-        x = input("Enter postion to add after: ")
-        add_after = order[x]
-        data = input("Enter data to be inserted: ")
-        current = self.self_next_index
-        add = (data, current, add_after)
-        self.adds.append(add)
-
-    def changeAll():
-        for add in self.adds:
-            self.add_element(add)
-
-        # Send adds to all connected devices
-        self.adds = []
-
-    def recive():
-        addsR = []  # recieve it from other
-        for add in addsR:
-            self.add_element(add)
-
-    def connect():
-        # connect and obtain user_id and name
-        idC = 2
-        nameC = 'B'
-        self.add_user(idC, nameC)
-
-    def delete_element_UI():
-        for i in range(len(self.docStr)):
-            print(f"{i}:{self.docStr[i]}", end=" ")
-        x = input("Enter postion to be deleted: ")
-        current = order[x]
-        self.deletes.append(current)
 
 
 if __name__ == '__main__':

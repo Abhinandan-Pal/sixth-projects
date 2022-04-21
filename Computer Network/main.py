@@ -13,21 +13,19 @@ old_text = ""
 
 def sync():
     global old_text
-    new_text = my_text.get("1.0", END)
-    delta = peer.get_CRDT_commands(old_text, new_text)
-
-    for element in delta[0]:
-        self_crdt.add_element(element)
-
-    for element in delta[1]:
-        self_crdt.delete_element(element)
+    new_text = my_text.get("1.0", END).rstrip('\n')
+    delta = peer.get_CRDT_commands(self_crdt, old_text, new_text)
 
     msg = pickle.dumps(delta)
     network.sync(msg)
+    my_text.delete(1.0, "end")
+    self_crdt.print_crdt()
+    my_text.insert(1.0, self_crdt.make_text())
     old_text = new_text
 
 
 def handle_update(ignore):
+    global old_text
     del ignore
     delta = network.recv_queue[0]
     network.recv_queue = network.recv_queue[1:]
@@ -40,6 +38,7 @@ def handle_update(ignore):
     my_text.delete(1.0, "end")
     self_crdt.print_crdt()
     my_text.insert(1.0, self_crdt.make_text())
+    old_text = self_crdt.make_text()
 
 
 root = Tk()
@@ -91,14 +90,7 @@ network.init(peers, root)
 # peer[*][4] will be the CRDT
 # uid is p + 1
 
-self_crdt = crdt(1, network.self_username)
-
-for p in range(len(peers)):
-    peers[p].append(crdt(peers[p][1], peers[p][2]))
-    peers[p][4].add_user(network.self_port, network.self_username)
-    for p2 in range(p):
-        peers[p2][4].add_user(peers[p][1], peers[p][2])
-        peers[p][4].add_user(peers[p][1], peers[p2][2])
+self_crdt = crdt(network.self_port, network.self_username)
 
 root.bind('<<RecvUpdate>>', handle_update)
 root.mainloop()
