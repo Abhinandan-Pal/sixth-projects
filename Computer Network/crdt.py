@@ -10,7 +10,14 @@ class index:
         return f"(uid = {self.user_id}, count = {self.count})"
 
     def __repr__(self):
-        return f"(uid = {self.user_id}, count = {self.count})"
+        #return f"(uid = {self.user_id}, count = {self.count})"
+        return f"({self.user_id},{self.count})"
+    
+    def __eq__(self,oth):
+        return (self.user_id == oth.user_id) and (self.count == oth.count)
+
+    def __hash__(self):
+        return self.user_id*50 + self.count
 
     def isgreater(in1, in2):
         if(in1.count > in2.count):
@@ -82,6 +89,7 @@ class crdt:
         while(a_pos < len(self.order) and index.isgreater(self.order[a_pos], current)):
             a_pos += 1
 
+        if current in self.order: self.order.remove(current)     # added to debug
         self.order.insert(a_pos, current)
         #print(f"Succesfully added {data} at {current} after {add_after}")
 
@@ -94,6 +102,7 @@ class crdt:
         self.doc[current][1] = False
 
     def print_crdt(self):
+        print(f"DOC : {self.doc}\n ORDER: {self.order}")
         for ind in self.order:
             val = self.doc[ind]
             if(val[1]):

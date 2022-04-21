@@ -38,7 +38,7 @@ def handle_update(ignore):
         self_crdt.delete_element(element)
 
     my_text.delete(1.0, "end")
-    print(self_crdt.make_text())
+    self_crdt.print_crdt()
     my_text.insert(1.0, self_crdt.make_text())
 
 
