@@ -1,4 +1,4 @@
-import json
+import pickle
 from crdt import crdt
 import peer
 import network
@@ -15,7 +15,6 @@ def sync():
     global old_text
     new_text = my_text.get("1.0", END)
     delta = peer.get_CRDT_commands(old_text, new_text)
-    print(delta)
 
     for element in delta[0]:
         self_crdt.add_element(element)
@@ -23,9 +22,24 @@ def sync():
     for element in delta[1]:
         self_crdt.delete_element(element)
 
-    msg = json.dumps(delta)
+    msg = pickle.dumps(delta)
     network.sync(msg)
     old_text = new_text
+
+
+def handle_update(ignore):
+    del ignore
+    delta = network.recv_queue[0]
+    network.recv_queue = network.recv_queue[1:]
+    for element in delta[0]:
+        self_crdt.add_element(element)
+
+    for element in delta[1]:
+        self_crdt.delete_element(element)
+
+    my_text.delete(1.0, "end")
+    print(self_crdt.make_text())
+    my_text.insert(1.0, self_crdt.make_text())
 
 
 root = Tk()
@@ -86,4 +100,5 @@ for p in range(len(peers)):
         peers[p2][4].add_user(peers[p][1], peers[p][2])
         peers[p][4].add_user(peers[p][1], peers[p2][2])
 
+root.bind('<<RecvUpdate>>', handle_update)
 root.mainloop()

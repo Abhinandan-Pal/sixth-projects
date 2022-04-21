@@ -1,4 +1,4 @@
-import json
+import pickle
 import socket
 import sys
 import threading
@@ -13,6 +13,7 @@ self_key: tuple[int, int] = (0, 0)
 peers = []
 
 server_thread = None
+recv_queue = []
 
 
 def server_thread_func(sock: socket.socket, root):
@@ -25,11 +26,14 @@ def server_thread_func(sock: socket.socket, root):
             conn.close()
             continue
 
-        msg = rsa.decrypt(peer[3], rsa.decrypt(self_key, int(msg)))
+        #msg = rsa.decrypt(peer[3], rsa.decrypt(self_key, int(msg)))
+        msg = rsa.decrypt(self_key, int(msg))
         msg = msg.to_bytes(4096, 'little').rstrip(b'\0')
         print(peer[2], ': ', msg)
 
-        delta = json.loads(msg)
+        print(b"RECV: " + msg)
+        delta = pickle.loads(msg)
+        recv_queue.append(delta)
         root.event_generate("<<RecvUpdate>>")
 
         conn.close()
@@ -53,7 +57,7 @@ def init(outpeers, root):
         port = int(port)
         key = (int(key), int(n))
 
-        peers.append((host, port, username, key))
+        peers.append([host, port, username, key])
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((self_host, self_port))
@@ -64,15 +68,16 @@ def init(outpeers, root):
     server_thread.start()
 
 
-def sync(msg: str):
+def sync(msg: bytes):
     for peer in peers:
         clientsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsock.connect((peer[0], peer[1]))
-        cleartext = int.from_bytes(msg.encode(), 'little')
+        print(b"SEND: " + msg)
+        cleartext = int.from_bytes(msg, 'little')
         # sign
-        ciphertext = rsa.encrypt(self_key, cleartext)
+        #ciphertext = rsa.encrypt(self_key, cleartext)
         # encrypt
-        ciphertext = rsa.encrypt(peer[3], ciphertext)
+        ciphertext = rsa.encrypt(peer[3], cleartext)
         clientsock.send((self_username + ' ' + str(ciphertext)).encode())
         clientsock.close()
 

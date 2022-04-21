@@ -9,6 +9,9 @@ class index:
     def __str__(self):
         return f"(uid = {self.user_id}, count = {self.count})"
 
+    def __repr__(self):
+        return f"(uid = {self.user_id}, count = {self.count})"
+
     def isgreater(in1, in2):
         if(in1.count > in2.count):
             return True
@@ -63,6 +66,7 @@ class crdt:
         raise RuntimeError(f'Trying to add after inexistent: {in2}')
 
     def add_element(self, element):
+        print(element)
 
         data: str = element[0]
         current: index = element[1]
@@ -94,6 +98,14 @@ class crdt:
             val = self.doc[ind]
             if(val[1]):
                 print(val[0])
+
+    def make_text(self):
+        text = ""
+        for ind in self.order:
+            val = self.doc[ind]
+            if(val[1]):
+                text += val[0]
+        return text
 
     def add_element_UI():
         for i in range(len(self.docStr)):
