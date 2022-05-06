@@ -20,11 +20,9 @@ class index:
         return 0
 
     def isgreater(in1, in2):
-        if(in1.count > in2.count):
-            return True
-        if(in1.user_id > in2.user_id):
-            return True
-        return False
+        if in1.count == in2.count:
+            return in1.user_id > in2.user_id
+        return in1.count > in2.count
 
 
 class add_element:
