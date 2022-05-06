@@ -74,21 +74,10 @@ file_menu.add_command(label="Save")
 file_menu.add_separator()
 file_menu.add_command(label="Exit")
 
-# Add Connect Menu
-edit_menu = Menu(my_menu, tearoff=False)
-my_menu.add_cascade(label="Connect", menu=edit_menu)
-edit_menu.add_command(label="Add Editor")
-edit_menu.add_command(label="Sync", command=sync)
-edit_menu.add_command(label="Exit")
-
-# Add Status Bar to Bottom of App
-status_bar = Label(root, text="Connecting...        ", anchor=E)
-status_bar.pack(fill=X, side=BOTTOM, ipady=5)
+# Add Sync button
+my_menu.add_command(label="Sync", command=sync)
 
 network.init(peers, root)
-
-# peer[*][4] will be the CRDT
-# uid is p + 1
 
 self_crdt = crdt(network.self_port, network.self_username)
 
